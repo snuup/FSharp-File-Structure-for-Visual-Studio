@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net48</TargetFramework>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FSharp.Compiler.Service" Version="34.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Page Include="../VSIXFSharpStruct/Toolwindow/Control.xaml" />
+        <Compile Include="../VSIXFSharpStruct/Toolwindow/Control.xaml.cs" />
+        <Compile Include="../VSIXFSharpStruct/Toolwindow/AstManager.cs" />
+        <Compile Include="../VSIXFSharpStruct/Toolwindow/Node.cs" />
+        <Compile Include="../VSIXFSharpStruct/Toolwindow/ImageTemplateSelector.cs" />
+        <Compile Include="../VSIXFSharpStruct/Toolwindow/ScrollIntoViewBehavior.cs" />
+        <Page Include="../VSIXFSharpStruct/Toolwindow/TreeView.Images.xaml" />
+        <Resource Include="../VSIXFSharpStruct/Toolwindow/TreeView.ItemStyle.xaml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FSharpFileAst\FSharpFileAst.fsproj" />
+    </ItemGroup>
+
+</Project>

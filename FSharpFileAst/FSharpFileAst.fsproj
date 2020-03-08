@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>../tools/snuup.snk</AssemblyOriginatorKeyFile>
+        <FileVersion>1.1</FileVersion>
+        <Company>@snuup (github)</Company>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="node.fs" />
+        <Compile Include="ast.fs" />
+        <None Include="lab.fsx" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FSharp.Compiler.Service" Version="34.1.1" />
+    </ItemGroup>
+
+</Project>
