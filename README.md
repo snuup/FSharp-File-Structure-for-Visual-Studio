@@ -1,8 +1,8 @@
 # F# File Structure Toolwindow for Visual Studio
 Visual Studio Extension for VS 2019 that provides a File Structure Toolwindow for F#
 
-![aaaa](https://github.com/snuup/FSharp-File-Structure-for-Visual-Studio/blob/master/preview.PNG)
-!(https://github.com/snuup/FSharp-File-Structure-for-Visual-Studio/blob/master/preview-dark.PNG)
+![preview](https://github.com/snuup/FSharp-File-Structure-for-Visual-Studio/blob/master/preview.PNG)
+![preview-dark](https://github.com/snuup/FSharp-File-Structure-for-Visual-Studio/blob/master/preview-dark.PNG)
 
 An extension for Visual Studio 2019. Provides a Toolwindow showing the outline or file structure of a F# code file.
 
