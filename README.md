@@ -1,6 +1,9 @@
 # F# File Structure Toolwindow for Visual Studio
 Visual Studio Extension for VS 2019 that provides a File Structure Toolwindow for F#
 
+![Alt text](./VSIXFSharpStruct/preview.png)
+![Alt text](./VSIXFSharpStruct/preview-dark.png)
+
 An extension for Visual Studio 2019. Provides a Toolwindow showing the outline or file structure of a F# code file.
 
 The project holds 3 assemblies in 3 projects:
