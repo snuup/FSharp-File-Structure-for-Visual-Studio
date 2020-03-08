@@ -11,7 +11,7 @@ open FSharpFileAst.TreeModel
 
 fsi.AddPrinter(fun (r:range) -> sprintf "R(%d,%d-%d,%d)" r.StartLine r.StartColumn r.EndLine r.EndColumn)
 
-let filename = @"g:\lab.fs"
+let filename = @"m:\lab.fs"
 let text = File.ReadAllText(filename)
 
 let an = TreeModel.getModel(filename, text)

@@ -287,10 +287,10 @@ let getUntypedTree (filename : string, text : string) =
     let pro,_ = checker.GetProjectOptionsFromScript(filename, text) |> Async.RunSynchronously
     // run the first phase (untyped parsing) of the compiler
     let po,_ = checker.GetParsingOptionsFromProjectOptions(pro)
-    let parseFileResults = checker.ParseFile(filename, text, po) |> Async.RunSynchronously
-    match parseFileResults.ParseTree with
+    let r = checker.ParseFile(filename, text, po) |> Async.RunSynchronously
+    match r.ParseTree with
     | Some tree -> tree
-    | None -> failwith "parser error"
+    | None -> r.Errors |> Seq.map (fun e -> e.Message) |> String.joined ", " |> failwith
 
 let getModel (filename, text : string) : Node =
     let ast = getUntypedTree (filename, text)
