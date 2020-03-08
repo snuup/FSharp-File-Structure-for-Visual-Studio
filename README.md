@@ -20,6 +20,6 @@ The Visual Studio extension providing the toolwindow.
 
 ## Tricky things: Signing
 Visual Studio extensions must be signed, including there referenced assemblies. Therefore FSharpFileAst and VSIXSharpStruct are signed.
-The problem is the FSharp.Compiler.Service.dll assembly that comes unsigned. The get around that, I converted the assembly with ilasm as can be seen in the sign.bat file inside the tools folder.
-The converted, signed, assembly is in the lib folder together with dependencies of FSharp.Compiler among which only the System.Buffers assembly is really needed. 
+The problem is that FSharp.Compiler.Service.dll assembly comes unsigned. The get around that, I converted the assembly with ilasm as can be seen in tools/sign.bat.
+The signed assembly is in the lib folder together with dependencies of FSharp.Compiler among which only the System.Buffers assembly is really needed. 
 Instead of nuget packages the projects refernce those assembly files so they get the signed versions.
