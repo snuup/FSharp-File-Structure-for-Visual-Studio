@@ -1,6 +1,8 @@
 # F# File Structure Toolwindow for Visual Studio
 Visual Studio Extension for VS 2019 that provides a File Structure Toolwindow for F#
 
+available at https://marketplace.visualstudio.com/items?itemName=snuup.FSharpFileStructure or inside the VS extension manager.
+
 ![preview](https://github.com/snuup/FSharp-File-Structure-for-Visual-Studio/blob/master/preview.PNG)
 ![preview-dark](https://github.com/snuup/FSharp-File-Structure-for-Visual-Studio/blob/master/preview-dark.PNG)
 
