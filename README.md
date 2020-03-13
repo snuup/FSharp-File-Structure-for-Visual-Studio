@@ -3,6 +3,8 @@ Visual Studio Extension for VS 2019 that provides a File Structure Toolwindow fo
 
 Rider has it, Ionide has it, now Visual Studio has it too.
 
+Available at https://marketplace.visualstudio.com/items?itemName=snuup.FSharpFileStructure or inside the VS extension manager.
+
 ![preview](https://github.com/snuup/FSharp-File-Structure-for-Visual-Studio/blob/master/preview.PNG)
 
 The project holds 3 assemblies in 3 projects:
