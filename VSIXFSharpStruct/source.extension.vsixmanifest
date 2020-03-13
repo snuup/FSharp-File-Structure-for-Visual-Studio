@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="VSIXFSharpStruct.70b261b3-2765-4b01-9d96-d12ce0bc3c36" Version="0.7" Language="en-US" Publisher="snuup" />
+        <Identity Id="VSIXFSharpStruct.70b261b3-2765-4b01-9d96-d12ce0bc3c36" Version="0.8" Language="en-US" Publisher="snuup" />
         <DisplayName>FSharp File Structure Toolwindow</DisplayName>
         <Description xml:space="preserve">FileStructure (Outline) for F#</Description>
         <License>license-gplv3.txt</License>

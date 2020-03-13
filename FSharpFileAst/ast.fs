@@ -58,7 +58,7 @@ module String =
             |> List.map (fun (somebool, syntype) -> syntype |> fromSynType lines)
             |> joined ", "
         | SynType.Array (someint, elementsyntype, r) -> elementsyntype |> fromSynType lines |> sp "%s[]"
-        | st -> sp "unknown syntype %A" st
+        | st -> "" // sp "unknown syntype %A" st
 
     let rec fromSynsImplePat lines =
         function
@@ -85,7 +85,7 @@ module String =
         //    idswdts
         //    |> fromlongidentwithdots
         //    |> sp "lid(%s)"
-        | p -> sp "unrecognized pattern %A" p
+        | p -> "" // sp "unrecognized pattern %A" p
 
     let fromValSig (vs : SynValSig) =
         match vs with
@@ -121,7 +121,7 @@ module String =
             // | DeprecatedCharRange of char * char * range:range
             // /// Used internally in the type checker
             // | InstanceMember of  Ident * Ident * (* holds additional ident for tooling *) Ident option * accesiblity:SynAccess option * range:range (* adhoc overloaded method/property *)
-            | p -> sp "missing pattern: %A" p
+            | p -> "" // sp "missing pattern: %A" p
         f synpat
 
 let getBinding (lines : string []) (Binding(access, kind, inlin, mutabl, attrs, xmlDoc, SynValData(memberflago, SynValInfo(argss, args), ido), pat, retinfo, body, r, sp) as co) =
@@ -150,7 +150,7 @@ let getBinding (lines : string []) (Binding(access, kind, inlin, mutabl, attrs, 
             let pats =
                 match synconstructorargs with
                 | SynConstructorArgs.Pats(pats) -> pats
-                | _ -> failwith "$missing SynConstructorArgs"
+                | _ -> [] // failwith "$missing SynConstructorArgs"
             let parameters = pats |> List.map (String.fromSynPat lines) |> String.joined " "
             sprintf "%s %s" membername parameters
         | _ -> getRangeText lines pat.Range // simple return the text for therange
@@ -300,4 +300,4 @@ let getModel (filename, text : string) : Node =
         let cn = getModulesAndNamespaces lines msns
         let totalrange = cn |> List.map (fun n -> n.Range) |> List.reduce Range.unionRanges
         Node((Path.GetFileName filename), SynType.File, cn, totalrange, msns)
-    | _ -> Node("parsing failed", SynType.Unknown, [], Range.range.Zero, null)
+    | _ -> Node(sp "parsing failed for %s" filename, SynType.Unknown, [], Range.range.Zero, null)
