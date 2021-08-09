@@ -23,16 +23,22 @@ let getRangeText (lines : string []) (r : range) =
             line.Substring(r.StartColumn, r.EndColumn - r.StartColumn)
         with e -> sp "problem %s" e.Message
 
-let isMarkedAsInterface (xmldoc :PreXmlDoc) =
-    match xmldoc with
-    | PreXmlDoc.PreXmlDoc(pos, collector) ->
-        match collector.LinesBefore(pos).LastOrDefault() with
-        | null -> false
-        | lastline ->
-            //System.Diagnostics.Trace.WriteLine(lastline)
-            let s = lastline.Trim()
-            s.StartsWith("fsi interface") || s.StartsWith("**")
-    | _ -> false
+let isMarkedAsInterface (preXmldoc : PreXmlDoc) =
+    //match xmldoc with
+    //| xmldoc
+    //| PreXmlDoc. (pos, collector) ->
+    //    match collector.LinesBefore(pos).LastOrDefault() with
+    //    | null -> false
+    //    | lastline ->
+    //        //System.Diagnostics.Trace.WriteLine(lastline)
+    //        let s = lastline.Trim()
+    //        s.StartsWith("fsi interface") || s.StartsWith("**")
+    //| _ -> false
+
+    //let xmldoc = preXmldoc.ToXmlDoc(false, None)
+    //if xmldoc.NonEmpty then
+    //    System.Diagnostics.Trace.WriteLine(xmldoc.GetXmlText() + "\n")
+    false
 
 module String =
 
