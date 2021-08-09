@@ -27,7 +27,6 @@ let isMarkedAsInterface (preXmldoc : PreXmlDoc) =
     let xmldoc = preXmldoc.ToXmlDoc(false, None)
     if xmldoc.NonEmpty && xmldoc.UnprocessedLines |> Seq.length > 0 then
         let lastLine = (xmldoc.UnprocessedLines |> Seq.last).Trim()
-        System.Diagnostics.Trace.WriteLine(lastLine + "\n")
         lastLine.StartsWith("fsi interface") || lastLine.StartsWith("**")
     else
         false
