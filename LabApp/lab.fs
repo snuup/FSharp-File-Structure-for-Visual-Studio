@@ -9,12 +9,6 @@ let marked1 = 2
 /// **
 let marked2 = 3
 
-///fsi interface
-let marked3 = 4
-
-/// fsi interface
-let marked4 = 5
-
 ///**
 /// Document
 let notMarked1 = 6
@@ -22,14 +16,6 @@ let notMarked1 = 6
 /// **
 /// Document
 let notMarked2 = 7
-
-///fsi interface
-/// Document
-let notMarked1 = 8
-
-/// fsi interface
-/// Document
-let notMarked2 = 9
 
 /// Commented alias
 type AliasType = List<int>
@@ -89,12 +75,6 @@ module InnerModule =
     /// **
     let marked2 = 3
 
-    ///fsi interface
-    let marked3 = 4
-
-    /// fsi interface
-    let marked4 = 5
-
     ///**
     /// Document
     let notMarked1 = 6
@@ -102,14 +82,6 @@ module InnerModule =
     /// **
     /// Document
     let notMarked2 = 7
-
-    ///fsi interface
-    /// Document
-    let notMarked1 = 8
-
-    /// fsi interface
-    /// Document
-    let notMarked2 = 9
 
     /// Commented alias
     type AliasType = List<int>

@@ -23,11 +23,11 @@ let getRangeText (lines : string []) (r : range) =
             line.Substring(r.StartColumn, r.EndColumn - r.StartColumn)
         with e -> sp "problem %s" e.Message
 
-let isMarkedAsInterface (preXmldoc : PreXmlDoc) =
+let isHighlighted (preXmldoc : PreXmlDoc) =
     let xmldoc = preXmldoc.ToXmlDoc(false, None)
     if xmldoc.NonEmpty && xmldoc.UnprocessedLines |> Seq.length > 0 then
         let lastLine = (xmldoc.UnprocessedLines |> Seq.last).Trim()
-        lastLine.StartsWith("fsi interface") || lastLine.StartsWith("**")
+        lastLine.StartsWith("**")
     else
         false
 
@@ -153,7 +153,7 @@ let getBinding (lines : string []) (SynBinding.SynBinding(access, kind, inlin, m
             let parameters = pats |> List.map (String.fromSynPat lines) |> String.joined " "
             sprintf "%s %s" membername parameters
         | _ -> getRangeText lines pat.Range // simple return the text for therange
-    let markedintf = isMarkedAsInterface xmlDoc
+    let markedintf = isHighlighted xmlDoc
     Node(caption, syntype, [], pat.Range, co, markedintf, syntypeflags)
 
 let rec getMember lines (m : SynMemberDefn) : Node list =
@@ -228,7 +228,7 @@ let getRecordField lines =
 
 let getType lines (SynTypeDefn(SynComponentInfo(atr, typeParans, constraints, lid, xmlDoc, preferPost, access, r2), typedefn, members, implicitConstructors, r) as co) : Node =
     let caption = lid |> String.fromLongIdent
-    let markedintf = isMarkedAsInterface xmlDoc
+    let markedintf = isHighlighted xmlDoc
 
     let createtypenode members =
         let membernodes = members |> List.collect (getMember lines)
@@ -268,7 +268,7 @@ let rec getDeclarations lines decls : Nodes =
         | SynModuleDecl.NestedModule(SynComponentInfo(_, _, _, lid, xmlDoc, _, _, _), isrec, decls, x, r) ->
             let caption = lid |> String.fromLongIdent
             let cn = getDeclarations lines decls
-            [ Node(caption, SynType.Module, cn, r, d, isMarkedAsInterface xmlDoc) ]
+            [ Node(caption, SynType.Module, cn, r, d, isHighlighted xmlDoc) ]
         | SynModuleDecl.Types(types, _) -> types |> List.map (getType lines)
         | _ -> []
     decls |> List.collect getdeclaration
