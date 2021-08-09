@@ -16,7 +16,7 @@ namespace Snuup
         {
             try
             {
-                var tw = Package.Instance.GetToolWindow<FileStructureToolWindow>();
+                var tw = Package.Instance?.GetToolWindow<FileStructureToolWindow>();
                 if (tw != null && tw.Control.IsVisible)
                 {
                     var line = e.NewPosition.BufferPosition.GetContainingLine();

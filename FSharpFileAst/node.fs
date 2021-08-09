@@ -2,6 +2,8 @@
 
 open System
 
+open FSharp.Compiler.Text
+
 type SynType =
     | File = 7
     | Namespace = 6
@@ -23,7 +25,7 @@ type Node =
     val Caption : string
     val Type : SynType
     val Children : Node list
-    val Range : FSharp.Compiler.Range.range
+    val Range : range
     val Compilernode : Object
     val IsInterface : bool
     val Tag : string

@@ -19,20 +19,25 @@ namespace LabApp
 
         Timer timer;
 
-        void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void LoadFile()
         {
-            var filename = @"m:/lab.fs";
+            const string filename =  @"../../../../FSharpFileAst/lab.fs";
             if (!File.Exists(filename)) MessageBox.Show("missing file: ....fs see source code in MainWindow.xaml.cs");
             var text = File.ReadAllText(filename);
 
             var astmgr = AstManager.Instance;
             astmgr.SetCodeFile(filename, text);
-            Node root = astmgr.Model;
+            var root = astmgr.Model;
             root.IsRoot = true;
             Console.WriteLine(root.IsInterfaced);
             this.fsc.SetModel(root);
+        }
 
-            this.timer = new Timer((state) => { this.fsc.Dispatcher.Invoke(new Action(() => { this.fsc.SelectNode(150); })); }, null, 1500, Timeout.Infinite);
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.timer = new Timer((state) => { this.fsc.Dispatcher.Invoke(new Action(() =>
+            {
+                this.LoadFile(); this.fsc.SelectNode(0); })); }, null, 1500, 5000);
         }
     }
 }
