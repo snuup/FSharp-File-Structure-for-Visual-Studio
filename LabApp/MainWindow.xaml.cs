@@ -21,7 +21,7 @@ namespace LabApp
 
         private void LoadFile()
         {
-            const string filename =  @"../../../../FSharpFileAst/lab.fs";
+            const string filename =  @"../../../lab.fs";
             if (!File.Exists(filename)) MessageBox.Show("missing file: ....fs see source code in MainWindow.xaml.cs");
             var text = File.ReadAllText(filename);
 
