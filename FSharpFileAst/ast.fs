@@ -24,30 +24,13 @@ let getRangeText (lines : string []) (r : range) =
         with e -> sp "problem %s" e.Message
 
 let isMarkedAsInterface (preXmldoc : PreXmlDoc) =
-    //match xmldoc with
-    //| xmldoc
-    //| PreXmlDoc. (pos, collector) ->
-    //    match collector.LinesBefore(pos).LastOrDefault() with
-    //    | null -> false
-    //    | lastline ->
-    //        //System.Diagnostics.Trace.WriteLine(lastline)
-    //        let s = lastline.Trim()
-    //        s.StartsWith("fsi interface") || s.StartsWith("**")
-    //| _ -> false
-
-    //let xmldoc = preXmldoc.ToXmlDoc(false, None)
-    //if xmldoc.NonEmpty then
-    //    System.Diagnostics.Trace.WriteLine(xmldoc.GetXmlText() + "\n")
-    false
-
-let markAsInterface members =
-    let isValidInterfaceMember  m =
-        match m with
-        | SynMemberDefn.AbstractSlot _
-        | SynMemberDefn.Inherit _
-        | SynMemberDefn.ImplicitInherit _ -> true
-        | _ -> false
-    members |> List.isEmpty |> not && members |> List.forall isValidInterfaceMember
+    let xmldoc = preXmldoc.ToXmlDoc(false, None)
+    if xmldoc.NonEmpty && xmldoc.UnprocessedLines |> Seq.length > 0 then
+        let lastLine = (xmldoc.UnprocessedLines |> Seq.last).Trim()
+        System.Diagnostics.Trace.WriteLine(lastLine + "\n")
+        lastLine.StartsWith("fsi interface") || lastLine.StartsWith("**")
+    else
+        false
 
 module String =
 
