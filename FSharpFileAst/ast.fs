@@ -40,6 +40,15 @@ let isMarkedAsInterface (preXmldoc : PreXmlDoc) =
     //    System.Diagnostics.Trace.WriteLine(xmldoc.GetXmlText() + "\n")
     false
 
+let markAsInterface members =
+    let isValidInterfaceMember  m =
+        match m with
+        | SynMemberDefn.AbstractSlot _
+        | SynMemberDefn.Inherit _
+        | SynMemberDefn.ImplicitInherit _ -> true
+        | _ -> false
+    members |> List.isEmpty |> not && members |> List.forall isValidInterfaceMember
+
 module String =
 
     let joined (separator : string) os : string =
