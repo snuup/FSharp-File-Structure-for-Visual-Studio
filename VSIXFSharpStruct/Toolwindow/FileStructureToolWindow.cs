@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.Shell;
 
 namespace Snuup
 {
+    using FSharp.Compiler.Text;
+
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.
     /// </summary>
@@ -46,7 +48,7 @@ namespace Snuup
 
         public void SetFilenameTitle(string filename) { this.Caption = "F# File Structure" + (filename == null ? "" : " -" + filename); }
 
-        void OnNavigateToLine(object sender, Range.range r)
+        void OnNavigateToLine(object sender, Range r)
         {
             Snuup.Package.Instance.NavigateTo(this.astmgr.Filename, r.StartLine - 1, r.StartColumn, r.EndLine - 1, r.EndColumn);
             Snuup.Package.Instance.ShowFileStructureToolWindow();

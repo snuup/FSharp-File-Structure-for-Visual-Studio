@@ -13,7 +13,7 @@ The project holds 3 assemblies in 3 projects:
 An F# project that computes the abstract syntax tree (AST) from a file and converts it into a TreeModel, which is another tree acting as the model of the XAML control that displays the file structure.
 
 ### LabApp (C#)
-This project references the user interface code inside VSIXSharpStruct and hosts the file structure control as a simple XAML App. This is useful whe working and debugging the ui part of the toolwindow.
+This project references the user interface code inside VSIXSharpStruct and hosts the file structure control as a simple XAML App. This is useful when working and debugging the ui part of the toolwindow.
 
 ### VSIXFSharpStruct (C#)
 The Visual Studio extension providing the toolwindow.

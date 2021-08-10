@@ -1,32 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using FSharp.Compiler;
-using AstNode = FSharpFileAst.Node;
 
 namespace Snuup
 {
+    using FSharp.Compiler.Text;
+
     public partial class FileStructureControl : UserControl
     {
         // holds the line number
-        public event EventHandler<Range.range> OnNavigateToLine;
+        public event EventHandler<Range> OnNavigateToLine;
 
         #region life
 
         public FileStructureControl()
         {
-            var z = new NiceNameGenerator();
-            var filename = z.GetType().Assembly.Location;
-            var fi = new FileInfo(filename);
-            var n = fi.Length;
-            Console.WriteLine(n);
-
             this.InitializeComponent();
-            Setter setter = new Setter(ScrollIntoViewBehavior.IsBroughtIntoViewWhenSelectedProperty, true);
+            var setter = new Setter(ScrollIntoViewBehavior.IsBroughtIntoViewWhenSelectedProperty, true);
             this.treeview.ItemContainerStyle.Setters.Add(setter);
         }
 

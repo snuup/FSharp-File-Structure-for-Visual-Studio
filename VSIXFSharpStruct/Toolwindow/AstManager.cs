@@ -9,7 +9,6 @@ namespace Snuup
         string currentText;
         public string Filename;
         public Node Model;
-        public EventHandler<string> codeanalysisreport;
 
         static AstManager instance;
 
@@ -26,7 +25,6 @@ namespace Snuup
                 var sw = Stopwatch.StartNew();
                 var an = TreeModel.getModel(filename, text);
                 sw.Stop();
-                this.codeanalysisreport?.Invoke(this, $"F# code analysis took {sw.ElapsedMilliseconds}ms");
                 this.Model.Assign(an, true);
             }
             else

@@ -15,16 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="FSharp.Compiler.Service">
-        <HintPath>..\lib\FSharp.Compiler.Service.dll</HintPath>
-      </Reference>
-        <Reference Include="System.Buffers">
-            <HintPath>..\lib\System.Buffers.dll</HintPath>
-        </Reference>
+        <PackageReference Include="FSharp.Compiler.Service" Version="40.0.0" />
+        <PackageReference Include="FSharp.Core" Version="5.0.2" />
     </ItemGroup>
-
-    <!--<ItemGroup>
-        <PackageReference Include="FSharp.Compiler.Service" Version="34.1.1" />
-    </ItemGroup>-->
-
 </Project>

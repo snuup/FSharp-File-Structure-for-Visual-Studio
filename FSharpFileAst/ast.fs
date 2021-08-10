@@ -3,16 +3,18 @@ module FSharpFileAst.TreeModel
 open System
 open System.IO
 open System.Linq
-open FSharp.Compiler.SourceCodeServices
-open FSharp.Compiler.Ast
 open FSharp.Compiler
 open FSharp.Compiler.Text
+open FSharp.Compiler.Xml
+open FSharp.Compiler.CodeAnalysis
+open FSharp.Compiler.Syntax
+
 
 let checker = FSharpChecker.Create()
 
 let sp = sprintf
 
-let getRangeText (lines : string []) (r : Range.range) =
+let getRangeText (lines : string []) (r : range) =
     if r.StartLine <> r.EndLine then "linesrange"
     else
         try
@@ -21,16 +23,13 @@ let getRangeText (lines : string []) (r : Range.range) =
             line.Substring(r.StartColumn, r.EndColumn - r.StartColumn)
         with e -> sp "problem %s" e.Message
 
-let isMarkedAsInterface (xmldoc :PreXmlDoc) =
-    match xmldoc with
-    | PreXmlDoc.PreXmlDoc(pos, collector) ->
-        match collector.LinesBefore(pos).LastOrDefault() with
-        | null -> false
-        | lastline ->
-            //System.Diagnostics.Trace.WriteLine(lastline)
-            let s = lastline.Trim()
-            s.StartsWith("fsi interface") || s.StartsWith("**")
-    | _ -> false
+let isHighlighted (preXmldoc : PreXmlDoc) =
+    let xmldoc = preXmldoc.ToXmlDoc(false, None)
+    if xmldoc.NonEmpty && xmldoc.UnprocessedLines |> Seq.length > 0 then
+        let lastLine = (xmldoc.UnprocessedLines |> Seq.last).Trim()
+        lastLine.StartsWith("**")
+    else
+        false
 
 module String =
 
@@ -89,7 +88,7 @@ module String =
 
     let fromValSig (vs : SynValSig) =
         match vs with
-        | SynValSig.ValSpfn(ident=id) -> fromIdent id
+        | SynValSig(ident=id) -> fromIdent id
 
     let rec fromSynPat lines synpat =
         let rec f =
@@ -124,17 +123,17 @@ module String =
             | p -> "" // sp "missing pattern: %A" p
         f synpat
 
-let getBinding (lines : string []) (Binding(access, kind, inlin, mutabl, attrs, xmlDoc, SynValData(memberflago, SynValInfo(argss, args), ido), pat, retinfo, body, r, sp) as co) =
+let getBinding (lines : string []) (SynBinding.SynBinding(access, kind, inlin, mutabl, attrs, xmlDoc, SynValData(memberflago, SynValInfo(argss, args), ido), pat, retinfo, body, r, sp) as co) =
     let syntype =
         match memberflago with
         | Some(memberflags) ->
             match memberflags.MemberKind with
-            | MemberKind.ClassConstructor -> SynType.CCtor
-            | MemberKind.Constructor -> SynType.Ctor
-            | MemberKind.Member -> SynType.Member
-            | MemberKind.PropertyGet -> SynType.Property
-            | MemberKind.PropertySet -> SynType.Property
-            | MemberKind.PropertyGetSet -> SynType.Property
+            | SynMemberKind.ClassConstructor -> SynType.CCtor
+            | SynMemberKind.Constructor -> SynType.Ctor
+            | SynMemberKind.Member -> SynType.Member
+            | SynMemberKind.PropertyGet -> SynType.Property
+            | SynMemberKind.PropertySet -> SynType.Property
+            | SynMemberKind.PropertyGetSet -> SynType.Property
         | None -> SynType.Member
     let syntypeflags =
         match memberflago with
@@ -149,17 +148,17 @@ let getBinding (lines : string []) (Binding(access, kind, inlin, mutabl, attrs, 
             let membername = idswdts |> String.fromLongIdentWithDots
             let pats =
                 match synconstructorargs with
-                | SynConstructorArgs.Pats(pats) -> pats
+                | SynArgPats.Pats(pats) -> pats
                 | _ -> [] // failwith "$missing SynConstructorArgs"
             let parameters = pats |> List.map (String.fromSynPat lines) |> String.joined " "
             sprintf "%s %s" membername parameters
         | _ -> getRangeText lines pat.Range // simple return the text for therange
-    let markedintf = isMarkedAsInterface xmlDoc
+    let markedintf = isHighlighted xmlDoc
     Node(caption, syntype, [], pat.Range, co, markedintf, syntypeflags)
 
 let rec getMember lines (m : SynMemberDefn) : Node list =
     match m with
-    | SynMemberDefn.ValField(Field(attrs, isstatic, identoption, typeName, b, xmlDoc, accessiblity, rr), r) ->
+    | SynMemberDefn.ValField(SynField.SynField(attrs, isstatic, identoption, typeName, b, xmlDoc, accessiblity, rr), r) ->
         let t = if isstatic then SynType.StaticValField else SynType.ValField
         let caption =
             match identoption with
@@ -174,7 +173,7 @@ let rec getMember lines (m : SynMemberDefn) : Node list =
         match members with
         | Some(ms) -> [n.WithChildren(ms |> List.collect (getMember lines))]
         | _ -> [n]
-    | SynMemberDefn.ImplicitCtor(accessiblity, attributes, ctorArgs, selfIdentifier, r) ->
+    | SynMemberDefn.ImplicitCtor(accessiblity, attributes, ctorArgs, selfIdentifier, xmlDoc, r) ->
         let createnode (sargs : SynSimplePat list) =
             let args = sargs |> List.map (String.fromSynsImplePat lines) |> String.joined ", "
             Node(sp "(%s)" args, SynType.Ctor, [], r, m)
@@ -187,25 +186,28 @@ let rec getMember lines (m : SynMemberDefn) : Node list =
         //    Node("boinding", SynType.Member, [], range, m) |> Some
         bindings |> List.map (getBinding lines)
     | SynMemberDefn.AutoProperty(ident=id;range=r) -> [Node(String.fromIdent id, SynType.Property, [], r, m)]
-    | SynMemberDefn.AbstractSlot(valSig,_,r) -> [Node(String.fromValSig valSig, SynType.Member, [], r, m)]
+    | SynMemberDefn.AbstractSlot(valSig,flags,r) -> [Node(String.fromValSig valSig, SynType.Member, [], r, m)]
+    | SynMemberDefn.Inherit(synType, _, _)
+    | SynMemberDefn.ImplicitInherit(synType, _, _, _) ->
+        [Node("inherit " + String.fromSynType lines synType, SynType.Interface, [], m.Range, m)]
     | m -> [Node(sp "?member? %O" (m.GetType().Name), SynType.Member, [], m.Range, m)]
 
 let getUnionCaseField lines =
     function
-    | SynField.Field(attributes, isStatic, ido, typeName, somebool, xmlDoc, accessiblity, r) ->
+    | SynField.SynField(attributes, isStatic, ido, typeName, somebool, xmlDoc, accessiblity, r) ->
         typeName |> String.fromSynType lines
 
 let getUnionCaseType lines =
     function
     /// Normal style declaration
-    | SynUnionCaseType.UnionCaseFields(fields) ->
+    | SynUnionCaseKind.Fields(fields) ->
         fields |> List.map (getUnionCaseField lines)
     /// Full type spec given by 'UnionCase : ty1 * tyN -> rty'. Only used in FSharp.Core, otherwise a warning.
-    | SynUnionCaseType.UnionCaseFullType(_) -> []
+    | SynUnionCaseKind.FullType(_) -> []
 
 let getSynUnionCase lines c =
     match c with
-    | UnionCase(attributes, id, caseType, xmlDoc, accessibility, r) ->
+    | SynUnionCase.SynUnionCase(attributes, id, caseType, xmlDoc, accessibility, r) ->
         let caseTypestring =
             match caseType |> getUnionCaseType lines with
             | [] -> ""
@@ -214,28 +216,28 @@ let getSynUnionCase lines c =
 
 let getSynEnumCase c =
     match c with
-    | EnumCase(attributes, id, synconst, xmlDoc, r) ->
+    | SynEnumCase.SynEnumCase(attributes, id, synconst, valueRange, xmlDoc, r) ->
         Node(id.idText, SynType.DUCase, [], r, c)
 
 let getRecordField lines =
     function
-    | SynField.Field(attributes, isStatic, ido, typeName, somebool, xmlDoc, accessiblity, r) ->
+    | SynField.SynField(attributes, isStatic, ido, typeName, somebool, xmlDoc, accessiblity, r) ->
         match ido with
         | Some(id) -> id.idText
         | None     -> typeName |> String.fromSynType lines // if we ever encounter a field with no name (how could that be?), we use the typename
 
-let getType lines (SynTypeDefn.TypeDefn(ComponentInfo(_, _, _, lid, xmlDoc, _, _, _), typedefn, members, r) as co) : Node =
+let getType lines (SynTypeDefn(SynComponentInfo(atr, typeParans, constraints, lid, xmlDoc, preferPost, access, r2), typedefn, members, implicitConstructors, r) as co) : Node =
     let caption = lid |> String.fromLongIdent
-    let markedintf = isMarkedAsInterface xmlDoc
+    let markedintf = isHighlighted xmlDoc
 
     let createtypenode members =
         let membernodes = members |> List.collect (getMember lines)
         new Node(caption, SynType.Class, membernodes, r, co, markedintf)
 
     match typedefn with
-    | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, ms, r) -> members |> createtypenode
-    | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconUnion, ms, r) -> members |> createtypenode
-    | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconClass, ms, r) -> ms |> createtypenode
+    | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.Augmentation, ms, r) -> members |> createtypenode
+    | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.Union, ms, r) -> members |> createtypenode
+    | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.Class, ms, r) -> ms |> createtypenode
     | SynTypeDefnRepr.ObjectModel(kind, ms, r) -> ms  |> createtypenode
     | SynTypeDefnRepr.Simple(simplrep, _) ->
         match simplrep with
@@ -263,10 +265,10 @@ let rec getDeclarations lines decls : Nodes =
         | SynModuleDecl.Let(isRec, bindings, range) ->
             // Let binding as a declaration is similar to let binding as an expression (in visitExpression), but has no body
             bindings |> List.map (getBinding lines)
-        | SynModuleDecl.NestedModule(ComponentInfo(_, _, _, lid, xmlDoc, _, _, _), isrec, decls, x, r) ->
+        | SynModuleDecl.NestedModule(SynComponentInfo(_, _, _, lid, xmlDoc, _, _, _), isrec, decls, x, r) ->
             let caption = lid |> String.fromLongIdent
             let cn = getDeclarations lines decls
-            [ Node(caption, SynType.Module, cn, r, d, isMarkedAsInterface xmlDoc) ]
+            [ Node(caption, SynType.Module, cn, r, d, isHighlighted xmlDoc) ]
         | SynModuleDecl.Types(types, _) -> types |> List.map (getType lines)
         | _ -> []
     decls |> List.collect getdeclaration
@@ -288,9 +290,7 @@ let getUntypedTree (filename : string, text : string) =
     // run the first phase (untyped parsing) of the compiler
     let po,_ = checker.GetParsingOptionsFromProjectOptions(pro)
     let r = checker.ParseFile(filename, text, po) |> Async.RunSynchronously
-    match r.ParseTree with
-    | Some tree -> tree
-    | None -> r.Errors |> Seq.map (fun e -> e.Message) |> String.joined ", " |> failwith
+    r.ParseTree
 
 let getModel (filename, text : string) : Node =
     let ast = getUntypedTree (filename, text)
@@ -300,4 +300,4 @@ let getModel (filename, text : string) : Node =
         let cn = getModulesAndNamespaces lines msns
         let totalrange = cn |> List.map (fun n -> n.Range) |> List.reduce Range.unionRanges
         Node((Path.GetFileName filename), SynType.File, cn, totalrange, msns)
-    | _ -> Node(sp "parsing failed for %s" filename, SynType.Unknown, [], Range.range.Zero, null)
+    | _ -> Node(sp "parsing failed for %s" filename, SynType.Unknown, [], range.Zero, null)
