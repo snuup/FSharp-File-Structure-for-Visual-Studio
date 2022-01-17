@@ -74,7 +74,7 @@ module String =
     let rec fromPattern (pat : SynPat) : string =
         match pat with
         | SynPat.Wild(r) -> "wild"
-        | SynPat.Named(pp, id, isThisVar, accessiblity, r) ->
+        | SynPat.Named(id, isThisVar, accessiblity, r) ->
             id |> fromIdent
         //| SynPat.LongIdent(dotId=LongIdentWithDots(lid, _)) -> lid |> getCaption |> sp "lid(%s)"
         //| SynPat.LongIdent(idswdts, (* holds additional ident for tooling *) ido, synvaltypardeclsoption, (* usually None: temporary used to parse "f<'a> x = x"*) synconstructorargs, synaccessoption, range) ->
@@ -95,7 +95,7 @@ module String =
             function
             | SynPat.Const(synconst,r) -> getRangeText lines r
             | SynPat.Wild(r) -> getRangeText lines r
-            | SynPat.Named(pat, id, isThisVar (* true if 'this' variable *), accessiblity:SynAccess option, r) ->
+            | SynPat.Named(id, isThisVar (* true if 'this' variable *), accessiblity:SynAccess option, r) ->
                 //printfn "pat = %A" pat - gives the same. always?
                 id |> fromIdent
             | SynPat.Typed(pat, typeName, r) -> sprintf "%s : %s" (pat |> f) (typeName |> fromSynType lines)
