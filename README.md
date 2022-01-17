@@ -1,5 +1,5 @@
 # F# File Structure Toolwindow for Visual Studio
-Visual Studio Extension for VS 2019 that provides a File Structure Toolwindow for F#
+Visual Studio Extension for VS 2022 that provides a File Structure Toolwindow for F#
 
 Rider has it, Ionide has it, now Visual Studio has it too.
 
